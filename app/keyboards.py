@@ -1,5 +1,6 @@
 from aiogram.types import (KeyboardButton,
                            ReplyKeyboardMarkup,
+                           ReplyKeyboardRemove,
                            InlineKeyboardButton,
                            InlineKeyboardMarkup, KeyboardButtonRequestUser)
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
@@ -30,11 +31,11 @@ settings = InlineKeyboardMarkup(inline_keyboard=[
                           url=START_PAKET)],
 ])
 
-cars = ['Lada', 'BMW', 'Volvo']
+# cars = ['Lada', 'BMW', 'Volvo']
 
 
-async def inline_cars():
-    keyboards = InlineKeyboardBuilder()
-    for car in cars:
-        keyboards.add(InlineKeyboardButton(text=car, callback_data=car))
-    return keyboards.adjust(3).as_markup()
+# async def inline_cars():
+#     keyboards = InlineKeyboardBuilder()
+#     for car in cars:
+#         keyboards.add(InlineKeyboardButton(text=car, callback_data=car))
+#     return keyboards.adjust(3).as_markup()

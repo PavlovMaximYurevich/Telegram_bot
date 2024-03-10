@@ -1,10 +1,14 @@
+import logging
+
 import app.keyboards as kb
+import app.reply_keyboards as keyb
 
 from aiogram import Router, F
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
+
 
 router = Router()
 
@@ -17,7 +21,7 @@ class Reg(StatesGroup):
 @router.message(CommandStart())
 async def cmd_start(message: Message):
     await message.reply(f'Привет {message.from_user.first_name}',
-                        reply_markup=kb.keyboard)
+                        reply_markup=keyb.test_kb)
 
 
 @router.message(Command('reg'))
@@ -41,8 +45,12 @@ async def reg_step_three(message: Message, state: FSMContext):
     await state.clear()
 
 
-@router.callback_query(F.data == 'approve')
-async def approve(callback: CallbackQuery):
-    await callback.answer(f'Вы нажали {callback.data}')
-    await callback.message.edit_text('Куку', reply_markup=await kb.inline_cars())
+# @router.callback_query(F.data == 'approve')
+# async def approve(callback: CallbackQuery):
+#     await callback.answer(f'Вы нажали {callback.data}')
+#     await callback.message.edit_text('Куку', reply_markup=await kb.inline_cars())
 
+
+@router.message(F.text.contains('при'))
+async def test_func(message: Message):
+    await message.answer("Это магический фильтр")
