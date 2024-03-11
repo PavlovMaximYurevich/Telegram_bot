@@ -2,6 +2,22 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
     KeyboardButtonRequestUser
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
+name_telegram = ReplyKeyboardMarkup(
+    resize_keyboard=True,
+    keyboard=[
+        [KeyboardButton(text='Выберите пользователя', request_user=KeyboardButtonRequestUser(request_id=1))]
+    ]
+)
+
+
+add_event = ReplyKeyboardMarkup(
+    resize_keyboard=True,
+    keyboard=[
+        [KeyboardButton(text='Добавить мероприятие')]
+    ]
+)
+
+
 start_kb = ReplyKeyboardMarkup(
     resize_keyboard=True,
     keyboard=[
@@ -28,4 +44,4 @@ test_kb = ReplyKeyboardMarkup(
 )
 
 
-del_keyboard = ReplyKeyboardRemove()
+# del_keyboard = ReplyKeyboardRemove()

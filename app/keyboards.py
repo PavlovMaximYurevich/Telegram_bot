@@ -34,6 +34,10 @@ settings = InlineKeyboardMarkup(inline_keyboard=[
 # cars = ['Lada', 'BMW', 'Volvo']
 
 
+
+
+
+
 # async def inline_cars():
 #     keyboards = InlineKeyboardBuilder()
 #     for car in cars:

@@ -3,6 +3,7 @@ import logging
 
 from aiogram import Dispatcher, Bot, F
 from aiogram.filters import Command, CommandStart
+from aiogram.fsm.strategy import FSMStrategy
 from aiogram.types import Message, BotCommandScopeAllPrivateChats
 
 from config import TOKEN
