@@ -2,15 +2,23 @@ import logging
 
 import app.keyboards as kb
 import app.reply_keyboards as keyb
+from telethon.tl.types import InputUser
+
+
+
+from telethon import TelegramClient
+from telethon.tl.functions.users import GetFullUserRequest
 
 from aiogram import Router, F
 from aiogram.filters import Command, CommandStart, StateFilter
-from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove, ReplyKeyboardMarkup
+from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove, ReplyKeyboardMarkup, ShippingQuery
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from Telegram_bot.app.default_keyboard import get_keyboard
 from Telegram_bot.app.reply_keyboards import name_telegram, add_event
+from Telegram_bot.database.orm_query import orm_add_event, orm_get_event, orm_get_all_event
 
 router = Router()
 
@@ -20,24 +28,21 @@ class Reg(StatesGroup):
     number_phone = State()
 
 
-class AddProduct(StatesGroup):
-    name_product = State()
-    description = State()
-    price = State()
+class AddEvent(StatesGroup):
+    event_name = State()
+    link = State()
+    tg_username = State()
 
 
 @router.message(CommandStart())
 async def start_cmd(message: Message):
     await message.answer(
-        "Привет, я виртуальный помощник",
+        "Привет, я могу добавить мероприятие\nЧтобы добавить нажми кнопку ниже",
         reply_markup=get_keyboard(
-            "Меню",
-            "О магазине",
-            "Варианты оплаты",
-            "Варианты доставки",
             "Добавить мероприятие",
+            "Все мероприятия",
             placeholder="Что вас интересует?",
-            sizes=(2, 2)
+            sizes=(2, )
         ),
     )
 
@@ -56,11 +61,11 @@ async def cancel_handler(message: Message, state: FSMContext):
 @router.message(StateFilter('*'), F.text.casefold() == 'назад')
 async def back_handler(message: Message, state: FSMContext):
     current_state = await state.get_state()
-    if current_state == AddProduct.name_product:
+    if current_state == AddEvent.event_name:
         await message.answer("Предыдущего шага нет")
         return
     previous_step = None
-    for step in AddProduct.__all_states__:
+    for step in AddEvent.__all_states__:
         if step.state == current_state:
             await state.set_state(previous_step)
             await message.answer('Вы вернулись к предыдущему шагу')
@@ -72,43 +77,51 @@ async def add_product(message: Message, state: FSMContext):
     await message.answer(
         "Введите название мероприятия", reply_markup=ReplyKeyboardRemove()
     )
-    await state.set_state(AddProduct.name_product)
+    await state.set_state(AddEvent.event_name)
 
 
-@router.message(AddProduct.name_product, F.text)
+@router.message(AddEvent.event_name, F.text)
 async def add_name_product(message: Message, state: FSMContext):
-    await state.update_data(name_product=message.text)
-    await message.answer("Введите ссылку локации")
-    await state.set_state(AddProduct.description)
+    await state.update_data(event_name=message.text)
+    await message.answer("Где будет проходить мероприятие?(можно отправить ссылку)")
+    await state.set_state(AddEvent.link)
 
 
-@router.message(AddProduct.description, F.text)
+@router.message(AddEvent.link, F.text)
 async def add_price_product(message: Message, state: FSMContext):
-    await state.update_data(description=message.text)
+    await state.update_data(link=message.text)
     await message.answer("Выберите контакт", reply_markup=name_telegram)
     # await message.answer(str(message.user_shared.user_id))
     # await message.answer_contact('Выберите контакт', reply_markup=name_telegram,
     #                              first_name=message.from_user.full_name)
-    await state.set_state(AddProduct.price)
+    await state.set_state(AddEvent.tg_username)
 
 
-@router.message(AddProduct.price)
+@router.message(AddEvent.tg_username)
 # async def finish(message: Message, state: FSMContext):
-async def finish(callback: CallbackQuery, state: FSMContext):
+async def finish(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
     user_id = callback.users_shared.user_ids[0]
-    # ss = user_id.from_user
-    # print(ss)
+    # from telethon.sync import TelegramClient
 
-    await state.update_data(price=user_id)
+    # from telethon import functions, types
+    # api_id = 29478159
+    # api_hash ='77d93175bd5dd564694fa6fedaf4bcd6'
+    #
+
+    await state.update_data(tg_username=user_id)
     user_data = await state.get_data()
-    await callback.answer(str(user_data))
+    # await callback.answer(str(user_data))
+    await callback.answer('ожидайте подтверждения')
+    await orm_add_event(session, user_data)
     await state.clear()
 
 
-@router.message(F.text == 'тест')
-async def testing_middleware(message: Message):
-    pass
-
+@router.message(F.text == 'Все мероприятия')
+async def get_all_events(message:Message, session: AsyncSession):
+    for event in await orm_get_all_event(session):
+        await message.answer(f'Мероприятие{event.event_name}\n'
+                             f'Ссылка {event.event_link}\n'
+                             f'Спикер {event.contact_tg}')
 
 
 
@@ -155,3 +168,5 @@ async def testing_middleware(message: Message):
 # @router.message(F.text.contains('при'))
 # async def test_func(message: Message):
 #     await message.answer("Это магический фильтр")
+
+

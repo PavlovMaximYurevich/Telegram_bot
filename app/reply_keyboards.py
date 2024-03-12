@@ -10,6 +10,9 @@ name_telegram = ReplyKeyboardMarkup(
 )
 
 
+button = KeyboardButtonRequestUser(request_id=1)
+
+
 add_event = ReplyKeyboardMarkup(
     resize_keyboard=True,
     keyboard=[
