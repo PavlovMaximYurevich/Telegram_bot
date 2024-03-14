@@ -12,11 +12,13 @@ load_dotenv(find_dotenv())
 
 from Telegram_bot.database.engine import create_db, drop_db, sessionmaker
 from Telegram_bot.middleware.db import DatabaseSession
-from config import TOKEN
+from config import TOKEN, TOKEN_ADMIN_BOT
 from app.handlers import router
 from common.bot_commands_list import private
 
+
 bot = Bot(token=TOKEN)
+# admin_bot = Bot(token=TOKEN_ADMIN_BOT)
 dispatcher = Dispatcher()
 dispatcher.include_router(router)
 
@@ -41,6 +43,10 @@ async def main():
                               scope=BotCommandScopeAllPrivateChats()
                               )
     await dispatcher.start_polling(bot)
+
+
+# async def adm_bot():
+#     await dispatcher.start_polling(admin_bot)
 
 
 if __name__ == '__main__':

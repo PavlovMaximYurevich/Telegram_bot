@@ -4,8 +4,6 @@ import app.keyboards as kb
 import app.reply_keyboards as keyb
 from telethon.tl.types import InputUser
 
-
-
 from telethon import TelegramClient
 from telethon.tl.functions.users import GetFullUserRequest
 
@@ -18,7 +16,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from Telegram_bot.app.default_keyboard import get_keyboard
 from Telegram_bot.app.reply_keyboards import name_telegram, add_event
+from Telegram_bot.config import TOKEN
 from Telegram_bot.database.orm_query import orm_add_event, orm_get_event, orm_get_all_event
+
+from aiogram import Dispatcher, Bot
+
 
 router = Router()
 
@@ -40,9 +42,9 @@ async def start_cmd(message: Message):
         "Привет, я могу добавить мероприятие\nЧтобы добавить нажми кнопку ниже",
         reply_markup=get_keyboard(
             "Добавить мероприятие",
-            "Все мероприятия",
+            # "Все мероприятия",
             placeholder="Что вас интересует?",
-            sizes=(2, )
+            sizes=(2,)
         ),
     )
 
@@ -99,7 +101,8 @@ async def add_price_product(message: Message, state: FSMContext):
 
 @router.message(AddEvent.tg_username)
 # async def finish(message: Message, state: FSMContext):
-async def finish(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
+async def finish(callback: CallbackQuery, state: FSMContext, session: AsyncSession, bot: Bot):
+    print(callback)
     user_id = callback.users_shared.user_ids[0]
     # from telethon.sync import TelegramClient
 
@@ -111,23 +114,35 @@ async def finish(callback: CallbackQuery, state: FSMContext, session: AsyncSessi
     await state.update_data(tg_username=user_id)
     user_data = await state.get_data()
     # await callback.answer(str(user_data))
+    # channel_id = '-4116868761'
+    #
+    #
+    # message_id = callback.message_id
+    # chat_id = callback.chat.id
+    # chat_id = f'-{chat_id}'
+    # print("CHAAAAAT", chat_id)
+    # print("MESSAGE", message_id)
+    # await callback.answer(str(user_data))
+    # await callback.answer(message_id)
+    # await callback.bot.forward_message(chat_id=channel_id, from_chat_id=chat_id, message_id=message_id)
+    # await forward_message(callback, channel_id)
+    # await bot.send_message(chat_id)
+    # TO_CHAT_ID = 7123407048
+    # await bot.send_message(channel_id, str(user_data))
+    # await bot.get_chat_administrators(chat_id)
+    # await bot.forward_message(TO_CHAT_ID, callback.chat.id, message_id)
+    # await bot.forward_message(c, message.chat.id, message.message_id)
     await callback.answer('ожидайте подтверждения')
     await orm_add_event(session, user_data)
     await state.clear()
 
 
 @router.message(F.text == 'Все мероприятия')
-async def get_all_events(message:Message, session: AsyncSession):
+async def get_all_events(message: Message, session: AsyncSession):
     for event in await orm_get_all_event(session):
         await message.answer(f'Мероприятие{event.event_name}\n'
                              f'Ссылка {event.event_link}\n'
                              f'Спикер {event.contact_tg}')
-
-
-
-
-
-
 
 
 
