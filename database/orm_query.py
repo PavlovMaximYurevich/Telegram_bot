@@ -8,7 +8,8 @@ async def orm_add_event(session: AsyncSession, user_data: dict):
     session.add(Event(
         event_name=user_data.get('event_name'),
         event_link=user_data.get('link'),
-        contact_tg=user_data.get('tg_username')
+        contact_tg=user_data.get('tg_username'),
+        chat_user_id=user_data.get('user_chat_id')
     ))
     # Здесь надо дождаться пока во втором боте нажмут да/нет
     await session.commit()

@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import sqlite3
+import time
 
 import aiosqlite
 from aiogram import Dispatcher, Bot, F
@@ -42,22 +43,30 @@ async def delete_event(callback: CallbackQuery, session: AsyncSession):
     await callback.answer("Отклонено!")
 
 
+
+
 @dispatcher.message()
-async def not_approved_events(message: Message, session: AsyncSession):
-    conn = sqlite3.connect('sqlite.db')
-    cursor = conn.cursor()
+async def not_approved_events(message: Message):
+    while True:
+        conn = sqlite3.connect('sqlite.db')
+        cursor = conn.cursor()
 
-    result = cursor.execute('SELECT * FROM event WHERE approved = "NOT"')
-    listt = result.fetchall()
+        result = cursor.execute('SELECT * FROM event WHERE approved = "NOT"')
 
-    for event in listt:
-        await message.answer(str(event[:5]), reply_markup=keyboard)
+        listt = result.fetchall()
 
+        for event in listt:
+
+            if "NOT" in event:
+                await message.answer(str(event[:5]), reply_markup=keyboard)
+        break
+
+    time.sleep(5)
 
 
 async def main_bot_2():
     dispatcher.update.middleware(DatabaseSession(session_pool=sessionmaker))
-    dispatcher.message('get_messages', get_from_database)
+    await not_approved_events()
     await dispatcher.start_polling(admin_bot)
 
 

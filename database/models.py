@@ -15,4 +15,5 @@ class Event(Base):
     event_link: Mapped[str] = mapped_column(Text, nullable=False)
     contact_tg: Mapped[str] = mapped_column(nullable=False)
     approved: Mapped[str] = mapped_column(nullable=False, default="NOT")
+    chat_user_id: Mapped[str] = mapped_column(nullable=False)
 
