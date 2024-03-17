@@ -1,7 +1,7 @@
 from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from Telegram_bot.database.models import Event
+from database.models import Event
 
 
 async def orm_add_event(session: AsyncSession, user_data: dict):
@@ -22,6 +22,12 @@ async def orm_get_all_event(session: AsyncSession):
 
 async def orm_get_event(session: AsyncSession, event_id: int):
     queryset = select(Event).where(Event.id == event_id)
+    res = await session.execute(queryset)
+    return res.scalar()
+
+
+async def not_approved_event(session: AsyncSession, user_data):
+    queryset = select(Event).where(Event.approved == "NOT")
     res = await session.execute(queryset)
     return res.scalar()
 

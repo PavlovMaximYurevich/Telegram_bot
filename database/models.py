@@ -14,4 +14,5 @@ class Event(Base):
     event_name: Mapped[str] = mapped_column(nullable=False)
     event_link: Mapped[str] = mapped_column(Text, nullable=False)
     contact_tg: Mapped[str] = mapped_column(nullable=False)
+    approved: Mapped[str] = mapped_column(nullable=False, default="NOT")
 

@@ -47,4 +47,9 @@ test_kb = ReplyKeyboardMarkup(
 )
 
 
-# del_keyboard = ReplyKeyboardRemove()
+yes_or_no_keyboard = ReplyKeyboardMarkup(
+    resize_keyboard=True,
+    keyboard=[
+        [KeyboardButton(text="YES"), KeyboardButton(text="NOT")]
+    ]
+)
