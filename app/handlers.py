@@ -1,4 +1,5 @@
-
+import asyncio
+import time
 
 from aiogram import Router, F
 from aiogram.filters import Command, CommandStart, StateFilter
@@ -114,6 +115,26 @@ async def finish(callback: CallbackQuery, state: FSMContext, session: AsyncSessi
     await callback.answer('ожидайте подтверждения')
     await orm_add_event(session, user_data)
     await state.clear()
+
+    while True:
+
+            for event in await orm_get_all_event(session):
+                if event.approved != "NOT":
+                    if event.id == user_data.get('id'):
+                        print('Изменился статус')
+                    # await callback.answer(f'Мероприятие {event.event_name}\n'
+                    #                      f'Ссылка {event.event_link}\n'
+                    #                      f'Спикер {event.contact_tg}',
+                    #                      reply_markup=approve_or_cancel_keyboard(
+                    #                          buttons={
+                    #                              "Подтвердить": f'approve_{event.id}',
+                    #                              "Отклонить": f'deny_{event.id}'})
+                    #                      )
+
+            break
+
+        # time.sleep(5)
+    await asyncio.sleep(5)
 
 
 @router.message(F.text == 'Все мероприятия')

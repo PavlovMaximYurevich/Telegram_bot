@@ -73,8 +73,8 @@ async def update_status(message: Message, session: AsyncSession):
 
         break
 
-    time.sleep(5)
-
+    # time.sleep(5)
+    await asyncio.sleep(5)
 
 @dispatcher.callback_query(StateFilter(None), (F.data.startswith('approve_') | F.data.startswith('deny_')))
 async def approve_event(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
