@@ -42,9 +42,9 @@ async def main():
     await bot.set_my_commands(commands=private,
                               scope=BotCommandScopeAllPrivateChats()
                               )
-    await bot.send_message(chat_id=5831896871, text='Привет')
+    # await bot.send_message(chat_id=5831896871, text='Привет')
     await dispatcher.start_polling(bot)
-    await bot.send_message(chat_id=5831896871, text='Привет')
+    # await bot.send_message(chat_id=5831896871, text='Привет')
 
 
 if __name__ == '__main__':

@@ -27,7 +27,7 @@ class AddEvent(StatesGroup):
     link = State()
     tg_username = State()
     approved = State()
-    user_chat_id = State()
+    # user_chat_id = State()
 
 
 @router.message(CommandStart())
@@ -97,18 +97,17 @@ async def add_price_product(message: Message, state: FSMContext):
     await state.set_state(AddEvent.tg_username)
 
 
-
-
-
 @router.message(AddEvent.tg_username)
 async def finish(callback: CallbackQuery, state: FSMContext, session: AsyncSession, bot: Bot):
     # print(callback.chat.id)
     user_id = callback.users_shared.user_ids[0]
-    your_user_id = callback.chat.id
+    # your_user_id = callback.chat.id
 
     await state.update_data(tg_username=user_id)
-    await state.update_data(user_chat_id=your_user_id)
+    # await state.update_data(approved)
+    # await state.update_data(user_chat_id=your_user_id)
     user_data = await state.get_data()
+    print(user_data)
     # await callback.send_message(chat_id=5831896871, text=f'{your_user_id}#Привет')
     # await bot.send_message(chat_id=7123407048, text=f'{your_user_id}')
     # await bot.send_message(chat_id=7123407048, text="Ждет одобрения")

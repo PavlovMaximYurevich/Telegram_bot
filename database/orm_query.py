@@ -9,7 +9,6 @@ async def orm_add_event(session: AsyncSession, user_data: dict):
         event_name=user_data.get('event_name'),
         event_link=user_data.get('link'),
         contact_tg=user_data.get('tg_username'),
-        chat_user_id=user_data.get('user_chat_id')
     ))
     # Здесь надо дождаться пока во втором боте нажмут да/нет
     await session.commit()
@@ -27,17 +26,12 @@ async def orm_get_event(session: AsyncSession, event_id: int):
     return res.scalar()
 
 
-async def not_approved_event(session: AsyncSession, user_data):
-    queryset = select(Event).where(Event.approved == "NOT")
-    res = await session.execute(queryset)
-    return res.scalar()
-
-
-async def orm_update_event(session: AsyncSession, event_id: int, user_data):
+async def orm_update_status(session: AsyncSession, event_id: int, user_data):
     queryset = update(Event).where(Event.id == event_id).values(
-        event_name=user_data.get('event_name'),
-        event_link=user_data.get('link'),
-        contact_tg=user_data.get('tg_username')
+        approved=user_data.get('approved')
+        # event_name=user_data.get('event_name'),
+        # event_link=user_data.get('link'),
+        # contact_tg=user_data.get('tg_username')
     )
     await session.execute(queryset)
     await session.commit()
